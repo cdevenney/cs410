@@ -1,0 +1,1 @@
+Top 10 most relevant words: [('said', 2044), ('new', 1854), ('us', 1514), ('reuters', 1358), ('ap', 864), ('first', 852), ('two', 838), ('tuesday', 826), ('monday', 763), ('wednesday', 748)]
