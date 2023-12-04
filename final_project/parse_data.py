@@ -1,13 +1,9 @@
 import pandas as pd
-
 import ast
-import string
-import nltk
-from nltk.corpus import stopwords
-from collections import Counter
-# Constants
 
-TITLE_WEIGHT = 2  # Weight for movie titles in TF-IDF calculation
+
+from nltk.corpus import stopwords
+# Constants
 
 # Load datasets
 def load_datasets():
@@ -18,97 +14,103 @@ def load_datasets():
 
 # Preprocess and combine data
 def preprocess_data(movies, credits, keywords):
-    
-   movies['id'] = movies['id'].astype(str)
-   credits['id'] = credits['id'].astype(str)
-   keywords['id'] = keywords['id'].astype(str)
+    # Ensure IDs are strings
+    movies['id'] = movies['id'].astype(str)
+    credits['id'] = credits['id'].astype(str)
+    keywords['id'] = keywords['id'].astype(str)
 
-   movies = movies.merge(credits, on='id')
-   movies = movies.merge(keywords, on='id')
-   
-   
-   
-   return movies
+    # Merge datasets
+    movies = movies.merge(credits, on='id')
+    movies = movies.merge(keywords, on='id')
 
-def clean_data(df):
+    # Concatenate genre and keywords
+    return movies
+
+# Cleaning crew and cast names
+#def clean_names(names):
+    # Lowercase and remove whitespace
+   # print("made it to clean names")
     
-    
-    for index, row in df.iterrows():
-        
-        # Combine title and description for complete text
-        text = row['all_info']
-        
+    #return [''.join(name.lower().split()) for name in ast.literal_eval(names)]
+
+# Clean the data for TF-IDF
+#def clean_data(df):
+    #for index, row in df.iterrows():
         # Convert all words to lowercase
-        text = text.lower()
-      
-        # Remove punctuation
-        text = text.translate(str.maketrans('', '', string.punctuation))
-      
-        # Remove numbers
-        text = ''.join(word for word in text if not word.isdigit())
-      
-        # Remove stopwords
-        stop_words = set(stopwords.words('english'))
-        words = text.split()
-        text = ' '.join([word for word in words if word not in stop_words])
-      
-        # Remove excess whitespaces
-        text = ' '.join(text.split())
-      
-        df.at[index, 'all_info'] = text
         
+        #print("made it into clean_data")
+        #row['title'] = row['title'].lower().replace(" ", "")
 
-    return df
+        # Cleaning names for 'crew' and 'cast'
+        
+        #row['crew'] = clean_names(row['crew'])
+        #row['cast'] = clean_names(row['cast'])
+        #row['production_companies'] = clean_names(row['production_companies'])
+        
+        #print("did we accomplish somethin")
 
+    #return df
 
+# Process user input
+def process_user_input(input_str):
+    # Split input by commas and clean each part
+    return [part.lower().replace(" ", "") for part in input_str.split(',')]
 
-def extract_language_names(row):
+def extract_names(row):
+    if pd.isnull(row):
+        return None
     try:
         # Safely evaluate the string as a list of dictionaries
         obj_list = ast.literal_eval(row)
         # Extract the 'name' field from each dictionary in the list
-        language_names = [obj['name'] for obj in obj_list if 'name' in obj]
-        return ', '.join(language_names)  # Join names into a single string
-    except:
-        return None  # In case of any error
+        names = [obj['name'].lower().replace(" ", "") for obj in obj_list if 'name' in obj]
+        return ', '.join(names)  # Join names into a single string
+    except SyntaxError:
+        print(f"SyntaxError in row: {row}")
+        return None
+    except Exception as e:
+        print(f"Error {e} in row: {row}")
+        return None
 
 # Apply the function to the 'spoken_language' column
 
 
 # Main execution
-#movies, credits, keywords = load_datasets()
+movies, credits, keywords = load_datasets()
+
+combined_data = preprocess_data(movies, credits, keywords)
 
 
-#combined_data = preprocess_data(movies, credits, keywords)
+combined_data['keywords'] = combined_data['keywords'].apply(extract_names)   
+
+#print(combined_data["keywords"].head(10))
+
+combined_data['genres'] = combined_data['genres'].apply(extract_names)
+
+#print(combined_data.columns)
+
+#print(combined_data["genres"].head(10))
+
+combined_data['keywords'] = combined_data['genres'].astype(str) + ', ' + combined_data['keywords'].astype(str)
+
+
+combined_data['cast'] = combined_data['cast'].apply(extract_names).astype(str)
+
+print(combined_data['cast'].head(1))
+combined_data['crew'] = combined_data['crew'].apply(extract_names).astype(str)
+combined_data['production_companies'] = combined_data['production_companies'].apply(extract_names).astype(str)
 
 
 
 
-#combined_data['keywords'] = combined_data['keywords'].apply(extract_language_names)   
-#combined_data['cast'] = combined_data['cast'].apply(extract_language_names)
-#combined_data['crew'] = combined_data['crew'].apply(extract_language_names)
-#combined_data['production_companies'] = combined_data['production_companies'].apply(extract_language_names)
-#combined_data['genres'] = combined_data['genres'].apply(extract_language_names)
+# Apply cleaning functions
+
+
+# Save to CSV
+combined_data.to_csv("final_movies.csv")
 
 
 
-#combined_data['all_info'] = combined_data['keywords'] + ', ' + combined_data['cast'] + ', ' + combined_data['overview'] +', ' + combined_data['crew'] + ', ' +combined_data['production_companies']+', ' + combined_data['genres']
-                             
-#print(combined_data['all_info'])
-#combined_data = combined_data[['id', 'adult', 'all_info', 'budget', 'revenue', 'title', 'runtime', 'vote_average']]
 
-#combined_data['all_info'] = combined_data['all_info'].astype(str)
-#clean_data(combined_data)
-
-#combined_data.to_csv("final_movies.csv")
-#print(combined_data.head(10))
-
-df = pd.read_csv("final_movies.csv")
-
-df['all_info'] = df['all_info'].astype(str)
-df = clean_data(df)
-
-df.to_csv("movies.csv")
-
-#print(combined_data['keywords']['name'])
 # Example search
+# ... (You would include your search functionality here)
