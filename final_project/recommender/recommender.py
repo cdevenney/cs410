@@ -1,6 +1,10 @@
 import pandas as pd
 import json
 from collections import defaultdict
+import os
+
+file_path1 = "user_genres.json"
+file_path2 = "user_ratings.json"
 
 def build_user_profiles(): 
     """
@@ -62,5 +66,13 @@ def build_user_profiles():
     with open(file_path2, 'w') as file:
         json.dump(user_profile_ratings, file)
 
+if not os.path.isfile("user_genres.json") and not os.path.isfile("user_ratings.json"):
+    build_user_profiles()
 
-build_user_profiles()
+with open(file_path1, 'r') as file:
+    user_genres = json.load(file)
+
+with open(file_path2, 'r') as file:
+    user_ratings = json.load(file)
+
+print(len(user_genres.keys()))
