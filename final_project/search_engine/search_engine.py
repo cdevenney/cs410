@@ -52,4 +52,4 @@ df['relevance_score'] = (
 
 # Sort by relevance score and display results
 sorted_df = df.sort_values(by='relevance_score', ascending=False)
-print(sorted_df[['title', 'relevance_score', 'vote_average']].head(10))
+print(sorted_df[['title', 'relevance_score', 'vote_average']].head(20))
