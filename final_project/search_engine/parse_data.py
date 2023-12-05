@@ -3,7 +3,7 @@ import ast
 
 
 from nltk.corpus import stopwords
-# Constants
+
 
 # Load datasets
 def load_datasets():
@@ -72,7 +72,6 @@ def extract_names(row):
         print(f"Error {e} in row: {row}")
         return None
 
-# Apply the function to the 'spoken_language' column
 
 
 # Main execution
@@ -110,7 +109,3 @@ combined_data['production_companies'] = combined_data['production_companies'].ap
 combined_data.to_csv("final_movies.csv")
 
 
-
-
-# Example search
-# ... (You would include your search functionality here)
